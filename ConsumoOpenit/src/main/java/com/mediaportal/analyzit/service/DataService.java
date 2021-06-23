@@ -1,6 +1,6 @@
 package com.mediaportal.analyzit.service;
 
-import com.mediaportal.analyzit.dto.ShowStats;
+import com.mediaportal.analyzit.dto.UsefulStats;
 import com.mediaportal.analyzit.dto.User;
 import com.mediaportal.analyzit.dto.Video;
 import com.mediaportal.analyzit.repository.DataRepository;
@@ -13,14 +13,14 @@ import java.util.Optional;
  * @author Giovanny Azevedo
  */
 public class DataService {
-    public static void watchedByUser() {
-        List<User> users = DataRepository.fetchUsersData("C:\\Users\\Media Portal\\Desktop\\dadosUsuario.txt");
+    public static void listWatchedByUser() {
+        List<User> users = DataRepository.fetchUsersData("C:\\Users\\GaoNpre\\Desktop\\dadosUsuario.txt");
    
-        List<Video> videos = DataRepository.fetchSessionData("C:\\Users\\Media Portal\\Desktop\\dadosSessao.txt");
+        List<Video> videos = DataRepository.fetchSessionData("C:\\Users\\GaoNpre\\Desktop\\dadosSessao.txt");
         
-        List<ShowStats> showStats = treatWatchedVideos(videos, users);
+        List<UsefulStats> usefulStats = arrangeUsefulStats(videos, users);
         
-        showStats.forEach(stats -> {
+        usefulStats.forEach(stats -> {
             System.out.println("Usuário:    " + stats.getUserName());
             System.out.println("Data:       " + stats.getDate());
             System.out.println("VídeoID:    " + stats.getVideoId());
@@ -33,13 +33,13 @@ public class DataService {
         
     }
     
-    public static List<ShowStats> treatWatchedVideos(List<Video> videos, List<User> users){
+    public static List<UsefulStats> arrangeUsefulStats(List<Video> videos, List<User> users){
         
-        List<ShowStats> showStats = new ArrayList();
+        List<UsefulStats> usefulStats = new ArrayList();
         
         videos.forEach(video -> {
             video.getSession().forEach(session -> {
-                //Obtem dados do user e da sessão
+                //Obtem dados do user e da sessão -- funcao(video, users, session)
                 String userName = users.stream().filter(user -> user.getSessao().equals(session.getSessionId())).findAny().get().getNome();
                 String date = users.stream().filter(user -> user.getSessao().equals(session.getSessionId())).findAny().get().getDate();
                 String videoId = video.getVideoId();
@@ -48,24 +48,24 @@ public class DataService {
                 String watchedPercentage = session.getWatchedPercentage();
                 Integer lastWatchedSegment = session.getLastWatchedSegment();
                 
-                //Verifica se o userName e o videoId existem em algum showStats, pega esse showStats e armazena nas variáveis.
-                Optional<ShowStats> userNameInContext = showStats.stream().filter(stats -> stats.getUserName().equals(userName)).findAny();
-                Optional<ShowStats> videoIdInContext = showStats.stream().filter(stats -> stats.getVideoId().equals(videoId)).findAny();
+                //Verifica se o userName e o videoId existem em algum usefulStats, pega esse usefulStats e armazena nas variáveis.
+                Optional<UsefulStats> usefulStatsAlreadyExists = usefulStats.stream()
+                        .filter(stats -> stats.getUserName().equals(userName) && stats.getVideoId().equals(videoId))
+                        .findAny();
                 
-                //Se já existir um mesmo user e video, obter o showStats desse user existente e atualizar os dados nele, sem criar um novo. 
-                if (!showStats.isEmpty() && userNameInContext.isPresent() && videoIdInContext.isPresent()) {
-
+                //Se já existir um mesmo user e video, obter o usefulStats desse user existente e atualizar os dados nele, sem criar um novo. 
+                if (!usefulStats.isEmpty() && usefulStatsAlreadyExists.isPresent()) {
                     //Salvar a data mais atual (PRECISA SER TRATADO AINDA!!!)
-                    userNameInContext.get().setDate(date);
-                    userNameInContext.get().setWatchedSegments(watchedSegments);
-                    userNameInContext.get().setLastWatchedSegment(lastWatchedSegment);
-                    userNameInContext.get().setWatchedPercentage(watchedPercentage);
+                    usefulStatsAlreadyExists.get().setDate(date);
+                    usefulStatsAlreadyExists.get().setWatchedSegments(watchedSegments);
+                    usefulStatsAlreadyExists.get().setLastWatchedSegment(lastWatchedSegment);
+                    usefulStatsAlreadyExists.get().setWatchedPercentage(watchedPercentage);
                 }else{
-                    //Cria um novo showStats
-                    showStats.add(new ShowStats(userName, date, videoId, totalSegments, watchedSegments, watchedPercentage, lastWatchedSegment));
+                    //Cria um novo usefulStats
+                    usefulStats.add(new UsefulStats(userName, date, videoId, totalSegments, watchedSegments, watchedPercentage, lastWatchedSegment));
                 }
             });
         });
-        return showStats;
+        return usefulStats;
     }
 }

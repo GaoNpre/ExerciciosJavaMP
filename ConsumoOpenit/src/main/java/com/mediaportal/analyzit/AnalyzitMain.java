@@ -8,6 +8,6 @@ import com.mediaportal.analyzit.service.DataService;
  */
 public class AnalyzitMain {
     public static void main(String[] args) {
-        DataService.watchedByUser();
+        DataService.listWatchedByUser();
     }  
 }
