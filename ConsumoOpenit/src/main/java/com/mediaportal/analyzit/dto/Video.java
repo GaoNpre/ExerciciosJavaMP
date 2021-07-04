@@ -1,6 +1,5 @@
 package com.mediaportal.analyzit.dto;
 
-import com.mediaportal.analyzit.dto.Session;
 import java.util.ArrayList;
 import java.util.List;
 

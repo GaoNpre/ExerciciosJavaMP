@@ -14,9 +14,8 @@ import java.util.Optional;
  */
 public class DataService {
     public static void listWatchedByUser() {
-        List<User> users = DataRepository.fetchUsersData("C:\\Users\\GaoNpre\\Desktop\\dadosUsuario.txt");
-   
-        List<Video> videos = DataRepository.fetchSessionData("C:\\Users\\GaoNpre\\Desktop\\dadosSessao.txt");
+        List<User> users = DataRepository.fetchUsersData();
+        List<Video> videos = DataRepository.fetchSessionData();
         
         List<UsefulStats> usefulStats = arrangeUsefulStats(videos, users);
         
@@ -39,9 +38,9 @@ public class DataService {
         
         videos.forEach(video -> {
             video.getSession().forEach(session -> {
-                //Obtem dados do user e da sessão -- funcao(video, users, session)
-                String userName = users.stream().filter(user -> user.getSessao().equals(session.getSessionId())).findAny().get().getNome();
-                String date = users.stream().filter(user -> user.getSessao().equals(session.getSessionId())).findAny().get().getDate();
+                //Obtem dados do user e da sessão
+                String userName = users.stream().filter(user -> user.getSession().equals(session.getSessionId())).findAny().get().getUserName();
+                String date = users.stream().filter(user -> user.getSession().equals(session.getSessionId())).findAny().get().getDate();
                 String videoId = video.getVideoId();
                 Integer totalSegments = session.getTotalSegments();
                 Integer watchedSegments = session.getWatchedSegments();
@@ -55,7 +54,6 @@ public class DataService {
                 
                 //Se já existir um mesmo user e video, obter o usefulStats desse user existente e atualizar os dados nele, sem criar um novo. 
                 if (!usefulStats.isEmpty() && usefulStatsAlreadyExists.isPresent()) {
-                    //Salvar a data mais atual (PRECISA SER TRATADO AINDA!!!)
                     usefulStatsAlreadyExists.get().setDate(date);
                     usefulStatsAlreadyExists.get().setWatchedSegments(watchedSegments);
                     usefulStatsAlreadyExists.get().setLastWatchedSegment(lastWatchedSegment);

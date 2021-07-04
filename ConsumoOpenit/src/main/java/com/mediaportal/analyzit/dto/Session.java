@@ -5,6 +5,7 @@ package com.mediaportal.analyzit.dto;
  * @author Giovanny Azevedo
  */
 public class Session {
+    private String videoId;
     private String sessionId;
     private Integer totalSegments;
     private Integer watchedSegments;
@@ -18,7 +19,19 @@ public class Session {
         this.watchedPercentage = watchedPercentage;
         this.lastWatchedSegment = lastWatchedSegment;
     }
+    
+    public Session() {
+        
+    }
 
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+    }
+    
     public String getSessionId() {
         return sessionId;
     }

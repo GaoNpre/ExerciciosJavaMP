@@ -1,10 +1,11 @@
 package com.mediaportal.analyzit.repository;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mediaportal.analyzit.dto.Session;
 import com.mediaportal.analyzit.dto.User;
 import com.mediaportal.analyzit.dto.Video;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,50 +16,45 @@ import java.util.List;
  */
 public class DataRepository {
 
-    public static List<User> fetchUsersData(String path) {
-        List<User> users = new ArrayList();
+    public static List<User> fetchUsersData() {
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<User> listUser = null;
         try {
-            BufferedReader data = new BufferedReader(new FileReader(path));
-            String dataLines = null;
-            while ((dataLines = data.readLine()) != null) {
-                String[] line = dataLines.split("\\|");
-                users.add(new User(line[0], line[1], line[2]));
-            }
-        } catch (IOException e) {
+            listUser = objectMapper.readValue(new File("C:\\Users\\GaoNpre\\Desktop\\dadosUsuario.json"), new TypeReference<List<User>>(){});
+        }catch(IOException e){
             System.err.printf("Error to open file: %s.\n", e.getMessage());
         }
-        return users;
+        return listUser;
     }
 
-    public static List<Video> fetchSessionData(String path) {
-        List<Video> videos = new ArrayList();
+    public static List<Video> fetchSessionData() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Session> sessions = null;
+        List<Video> videos = null;
         try {
-            BufferedReader data = new BufferedReader(new FileReader(path));
-            String dataLines = null;
-            List<String[]> lines = new ArrayList<String[]>();
-            while ((dataLines = data.readLine()) != null) {
-                lines.add(dataLines.split("\\|"));
-            }
-            videos = buildVideos(lines);
+            sessions = objectMapper.readValue(new File("C:\\Users\\GaoNpre\\Desktop\\dadosSessao.json"), new TypeReference<List<Session>>(){});
+            videos = buildVideos(sessions);
         } catch (IOException e) {
             System.err.printf("Error to open file: %s.\n", e.getMessage());
         }
         return videos;
     }
 
-    private static List<Video> buildVideos(List<String[]> lines) {
+    private static List<Video> buildVideos(List<Session> sessions) {
         List<String> videoIds = new ArrayList();
         List<Video> videos = new ArrayList();
 
-        for (int i = 0; i < lines.size(); i++) {
+        sessions.forEach(session -> {
             try{
-                String videoId = lines.get(i)[0];
-                String sessionId = lines.get(i)[1];
-                Integer totalSegments = Integer.parseInt(lines.get(i)[2]);
-                Integer watchedSegments = Integer.parseInt(lines.get(i)[3]);
-                String watchedPercentage = lines.get(i)[4];
-                Integer lastWatchedSegment = Integer.parseInt(lines.get(i)[5]);
+                String videoId = session.getVideoId();
+                String sessionId = session.getSessionId();
+                Integer totalSegments = session.getTotalSegments();
+                Integer watchedSegments = session.getWatchedSegments();
+                String watchedPercentage = session.getWatchedPercentage();
+                Integer lastWatchedSegment = session.getLastWatchedSegment();
 
+                //Verifica se já existe algum vídeo criado com esse videoId
                 if (!videoIds.contains(videoId)) {
                     videoIds.add(videoId);
                     Video video = new Video(videoId);
@@ -71,8 +67,8 @@ public class DataRepository {
             }catch(Exception e){
                 System.err.printf("[Error] Could not parse an empty value on method: buildVideos().\n");
             }
-            
-        }
+        }); 
+        
         return videos;
     }
 }

@@ -78,6 +78,4 @@ public class UsefulStats {
     public void setLastWatchedSegment(Integer lastWatchedSegment) {
         this.lastWatchedSegment = lastWatchedSegment;
     }
-    
-    
 }
