@@ -21,9 +21,9 @@ public class DataRepository {
         ObjectMapper objectMapper = new ObjectMapper();
         List<User> listUser = null;
         try {
-            listUser = objectMapper.readValue(new File("C:\\Users\\GaoNpre\\Desktop\\dadosUsuario.json"), new TypeReference<List<User>>(){});
+            listUser = objectMapper.readValue(new File("C:\\Users\\Media Portal\\Desktop\\dadosUsuario.json"), new TypeReference<List<User>>(){});
         }catch(IOException e){
-            System.err.printf("Error to open file: %s.\n", e.getMessage());
+            System.err.printf("Arquivo mal formatado: %s.\n", e.getMessage());
         }
         return listUser;
     }
@@ -33,10 +33,10 @@ public class DataRepository {
         List<Session> sessions = null;
         List<Video> videos = null;
         try {
-            sessions = objectMapper.readValue(new File("C:\\Users\\GaoNpre\\Desktop\\dadosSessao.json"), new TypeReference<List<Session>>(){});
+            sessions = objectMapper.readValue(new File("C:\\Users\\Media Portal\\Desktop\\dadosSessao.json"), new TypeReference<List<Session>>(){});
             videos = buildVideos(sessions);
         } catch (IOException e) {
-            System.err.printf("Error to open file: %s.\n", e.getMessage());
+            System.err.printf("Arquivo mal formatado: %s.\n", e.getMessage());
         }
         return videos;
     }
